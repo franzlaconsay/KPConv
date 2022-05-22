@@ -195,7 +195,7 @@ def load_snap_clouds(path, dataset, only_last=False):
                     data = read_ply(join(cloud_folder, f))
                     labels = data['class']
                     preds = data['preds']
-                    Confs[c_i] += confusion_matrix(labels, preds, dataset.label_values).astype(np.int32)
+                    Confs[c_i] += confusion_matrix(labels, preds, labels=dataset.label_values).astype(np.int32)
 
             np.savetxt(conf_file, Confs[c_i], '%12d')
 

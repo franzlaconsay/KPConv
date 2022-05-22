@@ -187,7 +187,7 @@ class ModelTester:
             # Compute classification results
             C1 = confusion_matrix(dataset.input_labels['test'],
                                   np.argmax(average_probs, axis=1),
-                                  test_labels)
+                                  labels=test_labels)
 
             ACC = 100 * np.sum(np.diag(C1)) / (np.sum(C1) + 1e-6)
             print('Test Accuracy = {:.1f}%'.format(ACC))
@@ -340,7 +340,7 @@ class ModelTester:
 
                 # Compute confusion matrices
                 parts = [j for j in range(proj_predictions[i].shape[1])]
-                Confs += [confusion_matrix(original_labels[i], np.argmax(average_predictions[i], axis=1), parts)]
+                Confs += [confusion_matrix(original_labels[i], np.argmax(average_predictions[i], axis=1), labels=parts)]
 
             t2 = time.time()
             print('Done in {:.1f} s\n'.format(t2 - t1))
@@ -550,7 +550,7 @@ class ModelTester:
 
                 # Compute confusion matrices
                 parts = [j for j in range(avg_probs.shape[1])]
-                Confs += [confusion_matrix(original_labels[obj_i], np.argmax(avg_probs, axis=1), parts)]
+                Confs += [confusion_matrix(original_labels[obj_i], np.argmax(avg_probs, axis=1), labels=parts)]
 
 
             t2 = time.time()
@@ -937,7 +937,7 @@ class ModelTester:
                         targets = dataset.input_labels['validation'][i_test]
 
                         # Confs
-                        Confs += [confusion_matrix(targets, preds, dataset.label_values)]
+                        Confs += [confusion_matrix(targets, preds, labels=dataset.label_values)]
 
                     # Regroup confusions
                     C = np.sum(np.stack(Confs), axis=0).astype(np.float32)
@@ -994,7 +994,7 @@ class ModelTester:
 
                             # Confusion
                             targets = dataset.validation_labels[i_test]
-                            Confs += [confusion_matrix(targets, preds, dataset.label_values)]
+                            Confs += [confusion_matrix(targets, preds, labels=dataset.label_values)]
 
                         t2 = time.time()
                         print('Done in {:.1f} s\n'.format(t2 - t1))

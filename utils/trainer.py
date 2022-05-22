@@ -40,12 +40,13 @@ from utils.ply import read_ply, write_ply
 from utils.metrics import IoU_from_confusions
 from sklearn.metrics import confusion_matrix
 
+import json
+
 # ----------------------------------------------------------------------------------------------------------------------
 #
 #           Trainer Class
 #       \*******************/
 #
-
 
 class ModelTrainer:
 
@@ -53,6 +54,7 @@ class ModelTrainer:
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, model, restore_snap=None):
+        self.epochs_log = []
 
         # Add training ops
         self.add_train_ops(model)
@@ -301,7 +303,8 @@ class ModelTrainer:
                 if model.config.saving and not exists(join(model.saving_path, 'running_PID.txt')):
                     break
 
-                if model.config.dataset.startswith('ShapeNetPart') or model.config.dataset.startswith('ModelNet'):
+                if model.config.dataset.startswith('ShapeNetPart') or model.config.dataset.startswith('ModelNet') \
+                or model.config.dataset.startswith('Pheno4d'):
                     if model.config.epoch_steps and epoch_n > model.config.epoch_steps:
                         raise tf.errors.OutOfRangeError(None, None, '')
 
@@ -369,6 +372,17 @@ class ModelTrainer:
             # Increment steps
             self.training_step += 1
             epoch_n += 1
+
+        # output to json
+        LOG_DIR = model.saving_path
+        data = {}
+        data['epochs'] = self.epochs_log
+        json_data = json.dumps(data)
+        print(json_data)
+        LOG_JSON = open(os.path.join(LOG_DIR, 'epochs.json'), 'w')
+        LOG_JSON.write(json_data)
+        LOG_JSON.flush()
+        LOG_JSON.close()
 
         # Remove File for kill signal
         if exists(join(model.saving_path, 'running_PID.txt')):
@@ -458,17 +472,17 @@ class ModelTrainer:
         # Compute classification results
         C1 = confusion_matrix(targets,
                               np.argmax(probs, axis=1),
-                              validation_labels)
+                              labels=validation_labels)
 
         # Compute training confusion
         C2 = confusion_matrix(self.training_labels,
                               self.training_preds,
-                              validation_labels)
+                              labels=validation_labels)
 
         # Compute votes confusion
         C3 = confusion_matrix(dataset.input_labels['validation'],
                               np.argmax(self.val_probs, axis=1),
-                              validation_labels)
+                              labels=validation_labels)
 
 
         # Saving (optionnal)
@@ -519,6 +533,14 @@ class ModelTrainer:
         # Initiate global prediction over all models
         if not hasattr(self, 'val_probs'):
             self.val_probs = [np.zeros((len(p_l), nc_model)) for p_l in dataset.input_point_labels['validation']]
+
+        # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        # print(type(self.val_probs))
+        # print(len(self.val_probs))
+        # print(self.val_probs[0])
+        # print(len(self.val_probs[0]))
+        # print(self.val_probs[13])
+        # print(len(self.val_probs[13]))
 
         #####################
         # Network predictions
@@ -583,7 +605,7 @@ class ModelTrainer:
         Confs = np.zeros((len(probs), n_parts, n_parts), dtype=np.int32)
         for i, (pred, truth) in enumerate(zip(probs, targets)):
             parts = [j for j in range(pred.shape[1])]
-            Confs[i, :, :] = confusion_matrix(truth, np.argmax(pred, axis=1), parts)
+            Confs[i, :, :] = confusion_matrix(truth, np.argmax(pred, axis=1), labels=parts)
 
         # Objects IoU
         IoUs = IoU_from_confusions(Confs)
@@ -593,10 +615,66 @@ class ModelTrainer:
         Confs = np.zeros((len(self.val_probs), n_parts, n_parts), dtype=np.int32)
         for i, (pred, truth) in enumerate(zip(self.val_probs, dataset.input_point_labels['validation'])):
             parts = [j for j in range(pred.shape[1])]
-            Confs[i, :, :] = confusion_matrix(truth, np.argmax(pred, axis=1), parts)
+            Confs[i, :, :] = confusion_matrix(truth, np.argmax(pred, axis=1), labels=parts)
 
         # Objects IoU
         vote_IoUs = IoU_from_confusions(Confs)
+
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        #print(Confs.shape)
+        #print(Confs[0])
+        #print(vote_IoUs.shape)
+        #print(np.sum(vote_IoUs,axis=0)) # for miou
+        #print(len(vote_IoUs))
+        # print(vote_IoUs)
+
+        total_matrix = np.zeros((2,2))
+        for matrix in Confs:
+          total_matrix += matrix
+          #print(matrix)
+        #print(total_matrix)
+        total_matrix /= len(self.val_probs)
+        TN = total_matrix[0][0]
+        FP = total_matrix[0][1]
+        FN = total_matrix[1][0]
+        TP = total_matrix[1][1]
+        
+        accuracy = (FP+FN)/(TP+TN+FP+FN)
+        stem_iou, leaf_iou = np.sum(vote_IoUs,axis=0) / len(self.val_probs)
+        miou = (stem_iou + leaf_iou) / 2
+        stem_recall, leaf_recall = np.diag(total_matrix) / np.sum(total_matrix, axis = 1)
+        stem_precision, leaf_precision = np.diag(total_matrix) / np.sum(total_matrix, axis = 0)
+
+        print('accuracy: %f' % accuracy)
+        print('miou: %f' % miou)
+        print('stem_iou: %f' % stem_iou)
+        print('leaf_iou: %f' % leaf_iou)
+        print('stem_recall: %f' % stem_recall)
+        print('leaf_recall: %f' % leaf_recall)
+        print('stem_precision: %f' % stem_precision)
+        print('leaf_precision: %f' % leaf_precision)
+        print('TN: %f' % TN)
+        print('FP: %f' % FP)
+        print('FN: %f' % FN)
+        print('TP: %f' % TP)
+
+        epoch_stats = {} # for json output
+        epoch_stats['accuracy'] = accuracy
+        epoch_stats['miou'] = miou
+        epoch_stats['stem_iou'] = stem_iou
+        epoch_stats['leaf_iou'] = leaf_iou
+        epoch_stats['stem_recall'] = stem_recall
+        epoch_stats['leaf_recall'] = leaf_recall
+        epoch_stats['stem_precision'] = stem_precision
+        epoch_stats['leaf_precision'] = leaf_precision
+        epoch_stats['tn'] = TN
+        epoch_stats['fp'] = FP
+        epoch_stats['fn'] = FN
+        epoch_stats['tp'] = TP
+
+        self.epochs_log.append(epoch_stats.copy())
+
+        
 
         # Saving (optionnal)
         if model.config.saving:
@@ -627,6 +705,9 @@ class ModelTrainer:
         mIoU = 100 * np.mean(IoUs)
         mIoU2 = 100 * np.mean(vote_IoUs)
         print('{:s} : mIoU = {:.1f}% / vote mIoU = {:.1f}%'.format(model.config.dataset, mIoU, mIoU2))
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        print(model.saving_path)
+        LOG_DIR = model.saving_path
 
         return
 
@@ -737,7 +818,7 @@ class ModelTrainer:
             preds = dataset.label_values[np.argmax(probs, axis=1)]
 
             # Confusions
-            Confs[i, :, :] = confusion_matrix(truth, preds, dataset.label_values)
+            Confs[i, :, :] = confusion_matrix(truth, preds, labels=dataset.label_values)
 
         # Sum all confusions
         C = np.sum(Confs, axis=0).astype(np.float32)
@@ -915,7 +996,7 @@ class ModelTrainer:
         obj_count = [0 for _ in n_objs]
         for obj, pred, truth in zip(objects, probs, targets):
             parts = [i for i in range(pred.shape[1])]
-            Confs[obj][obj_count[obj], :, :] = confusion_matrix(truth, np.argmax(pred, axis=1), parts)
+            Confs[obj][obj_count[obj], :, :] = confusion_matrix(truth, np.argmax(pred, axis=1), labels=parts)
             obj_count[obj] += 1
 
         # Objects mIoU
@@ -931,7 +1012,7 @@ class ModelTrainer:
                                     self.val_probs,
                                     dataset.input_point_labels['validation']):
             parts = [i for i in range(pred.shape[1])]
-            Confs[obj][obj_count[obj], :, :] = confusion_matrix(truth, np.argmax(pred, axis=1), parts)
+            Confs[obj][obj_count[obj], :, :] = confusion_matrix(truth, np.argmax(pred, axis=1), labels=parts)
             obj_count[obj] += 1
 
         # Objects mIoU
@@ -1162,8 +1243,6 @@ class ModelTrainer:
 
         print('\nFinished\n\n')
         time.sleep(0.5)
-
-
 
 
 
