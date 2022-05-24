@@ -230,6 +230,7 @@ if __name__ == '__main__':
                 config.saving_path = LOG_DIR
                 config.max_epoch = MAX_EPOCH
                 config.dataset = DATASET
+                config.lr_decays = {i: 0.1**(1/80) for i in range(1, MAX_EPOCH)}
 
                 ##############
                 # Prepare Data
