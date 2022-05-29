@@ -639,7 +639,7 @@ class ModelTrainer:
         FN = total_matrix[1][0]
         TP = total_matrix[1][1]
         
-        accuracy = (FP+FN)/(TP+TN+FP+FN)
+        accuracy = (TP+TN)/(TP+TN+FP+FN)
         stem_iou, leaf_iou = np.sum(vote_IoUs,axis=0) / len(self.val_probs)
         miou = (stem_iou + leaf_iou) / 2
         stem_recall, leaf_recall = np.diag(total_matrix) / np.sum(total_matrix, axis = 1)
