@@ -145,7 +145,7 @@ class ShapeNetPartConfig(Config):
     validation_size = 50
 
     # Number of epoch between each snapshot
-    snapshot_gap = 10
+    snapshot_gap = 100
 
     # Augmentations
     augment_scale_anisotropic = True
@@ -227,10 +227,59 @@ if __name__ == '__main__':
                 ###########################
 
                 config = ShapeNetPartConfig()
-                config.saving_path = LOG_DIR
-                config.max_epoch = MAX_EPOCH
                 config.dataset = DATASET
+                config.num_classes = None
+                config.network_model = None
+                config.input_threads = 8
+                config.architecture = ['simple',
+                                      'resnetb',
+                                      'resnetb_strided',
+                                      'resnetb',
+                                      'resnetb_strided',
+                                      'resnetb_deformable',
+                                      'resnetb_deformable_strided',
+                                      'resnetb_deformable',
+                                      'resnetb_deformable_strided',
+                                      'resnetb_deformable',
+                                      'nearest_upsample',
+                                      'unary',
+                                      'nearest_upsample',
+                                      'unary',
+                                      'nearest_upsample',
+                                      'unary',
+                                      'nearest_upsample',
+                                      'unary']
+                config.num_kernel_points = 15
+                config.first_subsampling_dl = 0.02
+                config.density_parameter = 5.0
+                config.KP_influence = 'linear'
+                config.KP_extent = 1.0
+                config.convolution_mode = 'sum'
+                config.modulated = False
+                config.offsets_loss = 'fitting'
+                config.offsets_decay = 0.1
+                config.in_features_dim = 4
+                config.use_batch_norm = True
+                config.batch_norm_momentum = 0.98
+                config.max_epoch = MAX_EPOCH
+                config.learning_rate = 1e-2
+                config.momentum = 0.98
                 config.lr_decays = {i: 0.1**(1/80) for i in range(1, MAX_EPOCH)}
+                config.grad_clip_norm = 100.0
+                config.batch_num = 4
+                config.epoch_steps = None
+                config.validation_size = 50
+                config.snapshot_gap = 100
+                config.augment_scale_anisotropic = True
+                config.augment_symmetries = [False, False, False]
+                config.augment_rotation = 'none'
+                config.augment_scale_min = 0.9
+                config.augment_scale_max = 1.1
+                config.augment_noise = 0.001
+                config.augment_occlusion = 'none'
+                config.batch_averaged_loss = False
+                config.saving = True
+                config.saving_path = LOG_DIR
 
                 ##############
                 # Prepare Data
