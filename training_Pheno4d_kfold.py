@@ -176,7 +176,7 @@ if __name__ == '__main__':
 
     ratios = [0.01, 0.10, 0.20, 0.50, 1.00]
     muls = [10, 2, 2, 1, 1]
-    max_iters = 5000
+    max_iters = 3000
 
     k = 5
     kfold = KFold(k, shuffle = True, random_state = 42)
