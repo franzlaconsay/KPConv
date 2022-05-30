@@ -193,8 +193,10 @@ if __name__ == '__main__':
                 print('category: %s, ratio: %s, kfold: %s' % (cat, str(ratios[ratio_i]), str(k_i[0])))
                 print('==================================================')
                 k_fold = k_i[0]
-                train_indices = k_i[1][0]
-                test_indices = k_i[1][1]
+                train_indices = [models[i] for i in k_i[1][0]]
+                test_indices = [models[i] for i in k_i[1][1]]
+                print(train_indices)
+                print(test_indices)
 
                 TRAIN_SAMPLE = ratios[ratio_i]
                 MAX_EPOCH = int(max_epochs)
