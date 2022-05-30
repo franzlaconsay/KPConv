@@ -222,11 +222,11 @@ class ShapeNetPartDataset(Dataset):
         train_files = sample(train_files, nsample)
         
         print('Train files: %d' % len(train_files))
-        print(train_files[0])
+        print(train_files)
         print('Val files: %d' % len(val_files))
-        print(val_files[0])
+        print(val_files)
         print('Test files: %d' % len(test_files))
-        print(test_files[0])
+        print(test_files)
         #a = 1/0
 
         # Val split
