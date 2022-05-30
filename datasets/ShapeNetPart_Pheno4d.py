@@ -89,7 +89,7 @@ class ShapeNetPartDataset(Dataset):
     # Initiation methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, class_name, input_threads=8, train_i=[1,2,3,4,5], test_i=[6,7], train_samples=1):
+    def __init__(self, class_name, input_threads=8, train_i=[1,2,3,4,5], test_i=[6,7], train_samples=1, folder_identifier=''):
         """
         Initiation method. Give the name of the object class to segment (for example 'Airplane') or 'multi' to segment
         all objects with a single model.
@@ -99,6 +99,7 @@ class ShapeNetPartDataset(Dataset):
         self.train_i = train_i
         self.test_i = test_i
         self.train_samples = train_samples
+        self.folder_identifier = folder_identifier
 
         ###########################
         # Object classes parameters
@@ -249,7 +250,7 @@ class ShapeNetPartDataset(Dataset):
         for split, files in zip(splits, split_files):
 
             # Create folder for this split
-            ply_path = join(self.path, '{:s}_ply'.format(split))
+            ply_path = join(self.path, '{:s}_ply_{:s}'.format(split, self.folder_identifier))
             if not exists(ply_path):
                 makedirs(ply_path)
 
@@ -318,7 +319,7 @@ class ShapeNetPartDataset(Dataset):
 
         # Load wanted points if possible
         print('\nLoading training points')
-        filename = join(self.path, 'train_{:.3f}_record.pkl'.format(subsampling_parameter))
+        filename = join(self.path, 'train_{:.3f}_record_{:s}.pkl'.format(subsampling_parameter, self.folder_identifier))
 
         if exists(filename):
             with open(filename, 'rb') as file:
@@ -330,7 +331,7 @@ class ShapeNetPartDataset(Dataset):
         else:
 
             # Collect training file names
-            split_path = join(self.path, '{:s}_ply'.format('train'))
+            split_path = join(self.path, '{:s}_ply_{:s}'.format('train', self.folder_identifier))
             names = [f[:-4] for f in listdir(split_path) if f[-4:] == '.ply']
             names = np.sort(names)
 
@@ -353,7 +354,7 @@ class ShapeNetPartDataset(Dataset):
             self.input_labels['training'] = np.array([self.name_to_label[name] for name in label_names])
 
             # Collect Validation file names
-            split_path = join(self.path, '{:s}_ply'.format('val'))
+            split_path = join(self.path, '{:s}_ply_{:s}'.format('val', self.folder_identifier))
             names = [f[:-4] for f in listdir(split_path) if f[-4:] == '.ply']
             names = np.sort(names)
 
@@ -395,7 +396,7 @@ class ShapeNetPartDataset(Dataset):
 
         # Load wanted points if possible
         print('\nLoading test points')
-        filename = join(self.path, 'test_{:.3f}_record.pkl'.format(subsampling_parameter))
+        filename = join(self.path, 'test_{:.3f}_record_{:s}.pkl'.format(subsampling_parameter, self.folder_identifier))
         if exists(filename):
             with open(filename, 'rb') as file:
                 self.input_labels['test'], \
@@ -406,7 +407,7 @@ class ShapeNetPartDataset(Dataset):
         else:
 
             # Collect test file names
-            split_path = join(self.path, '{:s}_ply'.format('test'))
+            split_path = join(self.path, '{:s}_ply_{:s}'.format('test', self.folder_identifier))
             names = [f[:-4] for f in listdir(split_path) if f[-4:] == '.ply']
             names = np.sort(names)
 

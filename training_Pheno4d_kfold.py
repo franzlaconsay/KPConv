@@ -292,7 +292,8 @@ if __name__ == '__main__':
                 print('*******************')
 
                 # Initiate dataset configuration
-                dataset = ShapeNetPartDataset(config.dataset.split('_')[1], config.input_threads, train_indices, test_indices, TRAIN_SAMPLE)
+                folder_identifier = '%s_%s_%s' % (cat, str(int(TRAIN_SAMPLE*100)), 'k'+str(k_fold))
+                dataset = ShapeNetPartDataset(config.dataset.split('_')[1], config.input_threads, train_indices, test_indices, TRAIN_SAMPLE, folder_identifier)
 
                 # Create subsampled input clouds
                 dl0 = config.first_subsampling_dl
