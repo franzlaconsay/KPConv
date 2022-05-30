@@ -294,7 +294,7 @@ if __name__ == '__main__':
 
                 # Create subsampled input clouds
                 dl0 = config.first_subsampling_dl
-                dataset.load_subsampled_clouds(0.005)
+                dataset.load_subsampled_clouds(dl0)
 
                 # Initialize input pipelines
                 dataset.init_input_pipeline(config)
