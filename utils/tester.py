@@ -570,8 +570,12 @@ class ModelTester:
         
         print("Length of Predictions", len(average_predictions))
         preds = np.argmax(average_predictions[0], axis=1).astype(np.int32)
-        save_segmented_ply(original_file,'evals/evaluated.ply',preds)
-
+        
+        #save_segmented_ply(original_file,'evals/evaluated.ply',preds)
+        
+        write_ply('evals/evaluated.ply',
+                          [original_points[0], original_labels[0], preds],
+                          ['x', 'y', 'z', 'gt', 'pre'])
         return
 
     def test_multi_segmentation(self, model, dataset, num_votes=100, num_saves=10):
