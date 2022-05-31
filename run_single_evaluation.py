@@ -5,6 +5,7 @@ import time
 from utils.config import Config
 from models.KPFCNN_model import KernelPointFCNN
 from utils.tester import ModelTester
+import numpy as np
 
 from datasets.Pheno4d_single import Pheno4D_Single
 parser = argparse.ArgumentParser()
@@ -74,7 +75,7 @@ def test_caller(path, step_ind, on_val, file):
     else:
         dataset.init_test_input_pipeline(config)
 
-    dataset.check_input_pipeline_training_length()
+    #dataset.check_input_pipeline_training_length()
     
     ##############
     # Define Model
