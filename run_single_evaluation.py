@@ -62,7 +62,7 @@ def test_caller(path, step_ind, on_val, file):
     dataset = Pheno4D_Single(config.dataset.split('_')[1], file, config.input_threads)
 
     # Create subsample clouds of the models
-    dl0 = config.first_subsampling_dl
+    dl0 = 0.02
     dataset.load_subsampled_clouds(dl0)
 
     # Initialize input pipelines
