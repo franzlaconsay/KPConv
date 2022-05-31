@@ -554,17 +554,20 @@ class Pheno4D_Single(Dataset):
         self.sess.run(self.train_init_op)
 
         # Run some epochs
+        epoch = 0
         d_len = 0
-        try:
-            # Run one step of the model.
-            # Get next inputs
-            np_flat_inputs_1 = self.sess.run(self.flat_inputs)
-            d_len+=1
-        except tf.errors.OutOfRangeError:
-            print('End of train dataset')
-            print("Length of train dataset: ", d_len)
-            
-            self.sess.run(self.train_init_op)
+        while epoch < 1:
+            try:
+                # Run one step of the model.
+                t = [time.time()]
+
+                # Get next inputs
+                np_flat_inputs_1 = self.sess.run(self.flat_inputs)
+            except tf.errors.OutOfRangeError:
+                print('End of train dataset')
+                print("Length of train dataset: ", d_len)
+                self.sess.run(self.train_init_op)
+                epoch += 1
 
         return
     
@@ -591,8 +594,6 @@ class Pheno4D_Single(Dataset):
 
                 # Get next inputs
                 np_flat_inputs_1 = self.sess.run(self.flat_inputs)
-
-
             except tf.errors.OutOfRangeError:
                 print('End of train dataset')
                 self.sess.run(self.train_init_op)
