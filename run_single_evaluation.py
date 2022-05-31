@@ -16,7 +16,7 @@ if os.path.exists('evals/'):
 
 os.makedirs('evals/')
 
-def test_caller(path, step_ind, on_val):
+def test_caller(path, step_ind, on_val, file):
 
     ##########################
     # Initiate the environment
@@ -59,7 +59,7 @@ def test_caller(path, step_ind, on_val):
     print('*******************')
 
 
-    dataset = Pheno4D_Single(config.dataset.split('_')[1], config.input_threads)
+    dataset = Pheno4D_Single(config.dataset.split('_')[1], file, config.input_threads)
 
     # Create subsample clouds of the models
     dl0 = config.first_subsampling_dl
@@ -133,6 +133,4 @@ def test_caller(path, step_ind, on_val):
 chosen_log = 'log/k0/'
 chosen_snapshot = -1
 on_val = False
-test_caller(chosen_log, chosen_snapshot, on_val)
-
-dataset.check_input_pipeline_training_length()
+test_caller(chosen_log, chosen_snapshot, on_val, args.ply_file)
