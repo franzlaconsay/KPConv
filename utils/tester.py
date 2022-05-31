@@ -560,14 +560,13 @@ class ModelTester:
             Confs = np.stack(Confs)
             IoUs = IoU_from_confusions(Confs)
             mIoUs = np.mean(IoUs, axis=-1)
-
             # Get X best and worst prediction
-
+            
+            print("MioU: ", mIoUs)
             # Initialise iterator with test data
             self.sess.run(dataset.test_init_op)
         
         # Save the cloud
-        
         print("Length of Predictions", len(average_predictions))
         preds = np.argmax(average_predictions[0], axis=1).astype(np.int32)
         
