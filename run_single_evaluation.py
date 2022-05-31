@@ -15,4 +15,5 @@ if os.path.exists('evals/'):
 
 os.makedirs('evals/')
 
-Pheno4D_Single('Maize', args.ply_file)
+dataset = Pheno4D_Single('Maize', args.ply_file)
+dataset.check_input_pipeline_training_length()
