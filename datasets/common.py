@@ -680,6 +680,7 @@ class Dataset:
             if self.ShapeNetPartType in self.label_names:
                 config.num_classes = self.num_parts[self.name_to_label[self.ShapeNetPartType]]
             else:
+                print("Type :", self.ShapeNetPartType)
                 raise ValueError('Wrong object name given for ShapeNetPart single object segmentation')
 
 
