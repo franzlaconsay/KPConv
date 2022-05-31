@@ -71,9 +71,8 @@ class Pheno4D_Single(Dataset):
         
         self.ShapeNetPartType = class_name
         self.network_model = 'segmentation'
-        self.num_train = None
-        self.num_test = None
-
+        self.num_train = 1
+        self.num_test = 1
         self.path = 'evals/'
         self.num_threads = input_threads
 
