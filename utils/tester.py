@@ -563,12 +563,13 @@ class ModelTester:
 
             # Get X best and worst prediction
 
-            # Save the cloud
-            preds = np.argmax(average_predictions[0], axis=1).astype(np.int32)
-            save_segmented_ply(original_file,'evals/evaluated.ply',preds)
-
             # Initialise iterator with test data
             self.sess.run(dataset.test_init_op)
+        
+        # Save the cloud
+        
+        preds = np.argmax(average_predictions[0], axis=1).astype(np.int32)
+        save_segmented_ply(original_file,'evals/evaluated.ply',preds)
 
         return
 
