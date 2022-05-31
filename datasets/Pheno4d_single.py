@@ -1,4 +1,5 @@
 # Basic libs
+from this import d
 import tensorflow as tf
 import numpy as np
 import time
@@ -531,7 +532,33 @@ class Pheno4D_Single(Dataset):
                 epoch += 1
 
         return
+    def check_input_pipeline_training_length(self):
+        # Create a session for running Ops on the Graph.
+        cProto = tf.ConfigProto()
+        cProto.gpu_options.allow_growth = True
+        self.sess = tf.Session(config=cProto)
 
+        # Init variables
+        self.sess.run(tf.global_variables_initializer())
+
+        # Initialise iterator with train data
+        self.sess.run(self.train_init_op)
+
+        # Run some epochs
+        d_len = 0
+        try:
+            # Run one step of the model.
+            # Get next inputs
+            np_flat_inputs_1 = self.sess.run(self.flat_inputs)
+            d_len+=1
+        except tf.errors.OutOfRangeError:
+            print('End of train dataset')
+            print("Length of train dataset: ", d_len)
+            
+            self.sess.run(self.train_init_op)
+
+        return
+    
     def check_input_pipeline_2(self, config):
 
         # Create a session for running Ops on the Graph.
