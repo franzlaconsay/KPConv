@@ -563,6 +563,7 @@ class Pheno4D_Single(Dataset):
 
                 # Get next inputs
                 np_flat_inputs_1 = self.sess.run(self.flat_inputs)
+                d_len+=1
             except tf.errors.OutOfRangeError:
                 print('End of train dataset')
                 print("Length of train dataset: ", d_len)
