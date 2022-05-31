@@ -109,7 +109,7 @@ def test_caller(path, step_ind, on_val, file):
     print('Start Test')
     print('**********\n')
 
-    tester.test_segmentation_single(model,dataset,'evals/for_evaluation.ply')
+    tester.test_segmentation_single(model,dataset,file)
     
         
 chosen_log = 'log/k0/'
