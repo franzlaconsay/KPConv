@@ -354,3 +354,28 @@ def describe_element(name, df):
 
     return element
 
+def save_segmented_ply(original_file, result_file,labels):
+    ply = open(original_file,'r')
+    evaluated = open(result_file,'w')
+    ply_lines = ply.readlines()
+    idx_label = 0
+    is_reading_header = True
+    for i in range(len(ply_lines)):
+        line = str(ply_lines[i])
+        if is_reading_header:
+                evaluated.write(line)
+                if 'end_header' in line:
+                    is_reading_header = False
+        else:
+                words = [x for x in line.split(' ')]
+                if len(words) > 6:
+                    words[-1] = str(labels[idx_label])
+                else:
+                    words.append(str(labels[idx_label]))
+                idx_label+=1
+                for j in range(len(words)-1):
+                    evaluated.write(words[j] + ' ')
+                evaluated.write(words[-1]+'\n')
+    ply.close()
+    evaluated.close()
+

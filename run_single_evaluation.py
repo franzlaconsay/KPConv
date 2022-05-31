@@ -1,7 +1,10 @@
 import argparse
 import os
 import shutil
+import time
 from utils.config import Config
+from models.KPFCNN_model import KernelPointFCNN
+from utils.tester import ModelTester
 
 from datasets.Pheno4d_single import Pheno4D_Single
 parser = argparse.ArgumentParser()
@@ -90,47 +93,25 @@ def test_caller(path, step_ind, on_val, file):
     chosen_step = np.sort(snap_steps)[step_ind]
     chosen_snap = os.path.join(path, 'snapshots', 'snap-{:d}'.format(chosen_step))
 
-    # # Create a tester class
-    # tester = ModelTester(model, restore_snap=chosen_snap)
-    # t2 = time.time()
+    # Create a tester class
+    tester = ModelTester(model, restore_snap=chosen_snap)
+    t2 = time.time()
 
-    # print('\n----------------')
-    # print('Done in {:.1f} s'.format(t2 - t1))
-    # print('----------------\n')
+    print('\n----------------')
+    print('Done in {:.1f} s'.format(t2 - t1))
+    print('----------------\n')
 
-    # ############
-    # # Start test
-    # ############
+    ############
+    # Start test
+    ############
 
-    # print('Start Test')
-    # print('**********\n')
+    print('Start Test')
+    print('**********\n')
 
-    # if config.dataset.startswith('ShapeNetPart'):
-    #     if config.dataset.split('_')[1] == 'multi':
-    #         tester.test_multi_segmentation(model, dataset)
-    #     else:
-    #         tester.test_segmentation(model, dataset)
-    # elif config.dataset.startswith('S3DIS'):
-    #     tester.test_cloud_segmentation_on_val(model, dataset)
-    # elif config.dataset.startswith('Scannet'):
-    #     if on_val:
-    #         tester.test_cloud_segmentation_on_val(model, dataset)
-    #     else:
-    #         tester.test_cloud_segmentation(model, dataset)
-    # elif config.dataset.startswith('Semantic3D'):
-    #     if on_val:
-    #         tester.test_cloud_segmentation_on_val(model, dataset)
-    #     else:
-    #         tester.test_cloud_segmentation(model, dataset)
-    # elif config.dataset.startswith('NPM3D'):
-    #     if on_val:
-    #         tester.test_cloud_segmentation_on_val(model, dataset)
-    #     else:
-    #         tester.test_cloud_segmentation(model, dataset)
-    # elif config.dataset.startswith('ModelNet40'):
-    #     tester.test_classification(model, dataset)
+    tester.test_segmentation_single(model,dataset,'evals/for_evaluation.ply')
+    
         
 chosen_log = 'log/k0/'
 chosen_snapshot = -1
 on_val = False
-test_caller(chosen_log, chosen_snapshot, on_val=True, file=args.ply_file)
+test_caller(chosen_log, chosen_snapshot, on_val=False, file=args.ply_file)

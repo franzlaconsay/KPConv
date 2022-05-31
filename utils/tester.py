@@ -31,7 +31,7 @@ import time
 from sklearn.neighbors import KDTree
 
 # PLY reader
-from utils.ply import read_ply, write_ply
+from utils.ply import read_ply, write_ply, save_segmented_ply
 
 # Metrics
 from utils.metrics import IoU_from_confusions
@@ -420,8 +420,157 @@ class ModelTester:
 
         return
     
-    # def test_segmentation_single(self, model, dataset, num_votes=100, num_saves=10):
+    def test_segmentation_single(self, model, dataset, file, num_votes=100, num_saves=10, ):
+        ##################
+        # Pre-computations
+        ##################
+
+        print('Preparing test structures')
+        t1 = time.time()
         
+        original_labels = []
+        original_points = []
+        projection_inds = []
+
+        # Read data in ply file
+        data = read_ply(file)
+        points = np.vstack((data['x'], -data['z'], data['y'])).T
+        original_labels += [data['label'] - 1]
+        original_points += [points]
+
+        # Create tree structure and compute neighbors
+        tree = KDTree(dataset.input_points['test'][i])
+        projection_inds += [np.squeeze(tree.query(points, return_distance=False))]
+
+        t2 = time.time()
+        print('Done in {:.1f} s\n'.format(t2 - t1))
+
+        ##########
+        # Initiate
+        ##########
+
+        # Test saving path
+        if model.config.saving:
+            test_path = join('test', model.saving_path.split('/')[-1])
+            if not exists(test_path):
+                makedirs(test_path)
+        else:
+            test_path = None
+
+        # Initialise iterator with test data
+        self.sess.run(dataset.test_init_op)
+
+        # Initiate result containers
+        average_predictions = [np.zeros((1, 1), dtype=np.float32)]
+
+        #####################
+        # Network predictions
+        #####################
+
+        mean_dt = np.zeros(2)
+        last_display = time.time()
+        for v in range(num_votes):
+
+            # Run model on all test examples
+            # ******************************
+
+            # Initiate result containers
+            all_predictions = []
+            all_labels = []
+            all_points = []
+            all_scales = []
+            all_rots = []
+
+            while True:
+                try:
+
+                    # Run one step of the model
+                    t = [time.time()]
+                    ops = (self.prob_logits,
+                           model.labels,
+                           model.inputs['in_batches'],
+                           model.inputs['points'],
+                           model.inputs['augment_scales'],
+                           model.inputs['augment_rotations'])
+                    preds, labels, batches, points, s, R = self.sess.run(ops, {model.dropout_prob: 1.0})
+                    t += [time.time()]
+
+                    # Stack all predictions for each class separately
+                    max_ind = np.max(batches)
+                    for b_i, b in enumerate(batches):
+
+                        # Eliminate shadow indices
+                        b = b[b < max_ind - 0.5]
+
+                        # Get prediction (only for the concerned parts)
+                        predictions = preds[b]
+
+                        # Stack all results
+                        all_predictions += [predictions]
+                        all_labels += [labels[b]]
+                        all_points += [points[0][b]]
+                        all_scales += [s[b_i]]
+                        all_rots += [R[b_i, :, :]]
+
+                    # Average timing
+                    t += [time.time()]
+                    mean_dt = 0.95 * mean_dt + 0.05 * (np.array(t[1:]) - np.array(t[:-1]))
+
+                    # Display
+                    if (t[-1] - last_display) > 1.0:
+                        last_display = t[-1]
+                        message = 'Vote {:d} : {:.1f}% (timings : {:4.2f} {:4.2f})'
+                        print(message.format(v,
+                                             100 * len(all_predictions) / len(original_labels),
+                                             1000 * (mean_dt[0]),
+                                             1000 * (mean_dt[1])))
+
+                except tf.errors.OutOfRangeError:
+                    break
+
+            # Project predictions on original point clouds
+            # ********************************************
+
+            print('\nGetting test confusions')
+            t1 = time.time()
+
+            proj_predictions = []
+            Confs = []
+
+            # Interpolate prediction from current positions to original points
+            proj_predictions += [all_predictions[0][projection_inds[0]]]
+
+            # Average prediction across votes
+            average_predictions[0] = average_predictions[0] + (proj_predictions[0] - average_predictions[0]) / (v + 1)
+
+            # Compute confusion matrices
+            parts = [j for j in range(proj_predictions[0].shape[1])]
+            Confs += [confusion_matrix(original_labels[0], np.argmax(average_predictions[0], axis=1), labels=parts)]
+
+            t2 = time.time()
+            print('Done in {:.1f} s\n'.format(t2 - t1))
+
+            # Save the best/worst segmentations per class
+            # *******************************************
+
+            print('Saving test examples')
+            t1 = time.time()
+
+            # Regroup confusions per object class
+            Confs = np.stack(Confs)
+            IoUs = IoU_from_confusions(Confs)
+            mIoUs = np.mean(IoUs, axis=-1)
+
+            # Get X best and worst prediction
+
+            # Save the cloud
+            preds = np.argmax(average_predictions[0], axis=1).astype(np.int32)
+            save_segmented_ply(file,'evals/evaluated.ply',preds)
+
+            # Initialise iterator with test data
+            self.sess.run(dataset.test_init_op)
+
+        return
 
     def test_multi_segmentation(self, model, dataset, num_votes=100, num_saves=10):
 
