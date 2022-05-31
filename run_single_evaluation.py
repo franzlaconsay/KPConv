@@ -133,7 +133,6 @@ def test_caller(path, step_ind, on_val):
 chosen_log = 'log/k0/'
 chosen_snapshot = -1
 on_val = False
-dataset = Pheno4D_Single('Maize', args.ply_file)
 test_caller(chosen_log, chosen_snapshot, on_val)
 
 dataset.check_input_pipeline_training_length()
