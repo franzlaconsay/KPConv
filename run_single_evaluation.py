@@ -1,7 +1,9 @@
 import argparse
+from operator import truediv
 import os
 import shutil
 import time
+from xml.etree.ElementTree import TreeBuilder
 from utils.config import Config
 from models.KPFCNN_model import KernelPointFCNN
 from utils.tester import ModelTester
@@ -115,4 +117,4 @@ def test_caller(path, step_ind, on_val, file):
 chosen_log = 'log/k0/'
 chosen_snapshot = -1
 on_val = False
-test_caller(chosen_log, chosen_snapshot, on_val=False, file=args.ply_file)
+test_caller(chosen_log, chosen_snapshot, on_val=True, file=args.ply_file)
