@@ -194,6 +194,10 @@ class Pheno4D_Single(Dataset):
             data = read_ply('evals/for_evaluation.ply')
             points = np.vstack((data['x'], data['y'], data['z'])).T
             point_labels = data['label']
+            points = points.astype(np.float32)
+            print("Point Type", points.dtype)
+            point_labels = point_labels.astype(np.int32)
+            print("Label Type", point_labels.dtype)
             if subsampling_parameter > 0:
                 sub_points, sub_labels = grid_subsampling(points, labels=point_labels,
                                                             sampleDl=subsampling_parameter)
