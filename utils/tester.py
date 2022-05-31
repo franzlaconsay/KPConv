@@ -420,7 +420,7 @@ class ModelTester:
 
         return
     
-    def test_segmentation_single(self, model, dataset, file, num_votes=100, num_saves=10, ):
+    def test_segmentation_single(self, model, dataset, original_file, binary_file, num_votes=100, num_saves=10, ):
         ##################
         # Pre-computations
         ##################
@@ -433,7 +433,7 @@ class ModelTester:
         projection_inds = []
 
         # Read data in ply file
-        data = read_ply(file)
+        data = read_ply(binary_file)
         points = np.vstack((data['x'], -data['z'], data['y'])).T
         original_labels += [data['label'] - 1]
         original_points += [points]
@@ -565,7 +565,7 @@ class ModelTester:
 
             # Save the cloud
             preds = np.argmax(average_predictions[0], axis=1).astype(np.int32)
-            save_segmented_ply(file,'evals/evaluated.ply',preds)
+            save_segmented_ply(original_file,'evals/evaluated.ply',preds)
 
             # Initialise iterator with test data
             self.sess.run(dataset.test_init_op)
