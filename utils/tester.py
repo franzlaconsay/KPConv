@@ -568,6 +568,7 @@ class ModelTester:
         
         # Save the cloud
         
+        print("Length of Predictions", len(average_predictions))
         preds = np.argmax(average_predictions[0], axis=1).astype(np.int32)
         save_segmented_ply(original_file,'evals/evaluated.ply',preds)
 
