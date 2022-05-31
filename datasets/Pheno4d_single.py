@@ -61,8 +61,9 @@ class Pheno4D_Single(Dataset):
         elif self.category == 'TOMATO':
           self.label_to_names = {0: 'Tomato'}
 
+        self.init_labels()
         # List of classes ignored during training (can be empty)
-        #self.ignored_labels = np.array([])
+        self.ignored_labels = np.array([])
 
         # Number of parts for each object
         if self.category == 'MAIZE' or self.category == 'TOMATO':
