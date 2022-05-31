@@ -434,7 +434,8 @@ class ModelTester:
 
         # Read data in ply file
         data = read_ply(binary_file)
-        points = np.vstack((data['x'], -data['z'], data['y'])).T
+        #points = np.vstack((data['x'], -data['z'], data['y'])).T
+        points = np.vstack((data['x'], data['y'], data['z'])).T
         original_labels += [data['label'] - 1]
         original_points += [points]
 
