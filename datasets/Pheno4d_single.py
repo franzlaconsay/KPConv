@@ -157,7 +157,7 @@ class Pheno4D_Single(Dataset):
             print(points)
             point_labels = data['label']
             points = points.astype(np.float32)
-            point_labels = point_labels.astype(np.float32)
+            point_labels = point_labels.astype(np.int32)
             
             if subsampling_parameter > 0:
                 sub_points, sub_labels = grid_subsampling(points, labels=point_labels,
