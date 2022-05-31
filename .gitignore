@@ -3,5 +3,6 @@ results
 Data/*
 !Data/pheno4d_kpconv_maize
 !Data/pheno4d_kpconv_tomato
+!log/k0
 */__pycache__
 *.so*

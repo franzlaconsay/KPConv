@@ -419,6 +419,9 @@ class ModelTester:
             self.sess.run(dataset.test_init_op)
 
         return
+    
+    # def test_segmentation_single(self, model, dataset, num_votes=100, num_saves=10):
+        
 
     def test_multi_segmentation(self, model, dataset, num_votes=100, num_saves=10):
 
