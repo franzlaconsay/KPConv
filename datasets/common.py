@@ -779,6 +779,7 @@ class Dataset:
                 config.num_classes = self.num_parts[self.name_to_label[self.ShapeNetPartType]]
             else:
                 print("Type :", self.ShapeNetPartType)
+                print("Label Names: ", self.label_names)
                 raise ValueError('Wrong object name given for ShapeNetPart single object segmentation')
 
         # Calibrate generators to batch_num
