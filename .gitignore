@@ -1,4 +1,4 @@
-log
+log/*
 results
 Data/*
 !Data/pheno4d_kpconv_maize

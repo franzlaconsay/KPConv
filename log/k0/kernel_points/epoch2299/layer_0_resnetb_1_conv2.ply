@@ -1,0 +1,8 @@
+ply
+format binary_little_endian 1.0
+element vertex 15
+property float32 x
+property float32 y
+property float32 z
+end_header
+¬Ñ9YÓ#·Ô“¹b!ô<#Sf9þ]­»¼`¼o–š¼3)¯¼m”—<ry<èÂµ<·z„<5„¬¼í8]¼lŸ”<ÈŽ¼K‹<¶¼?ÒØ<§|A¼Q#<%¹Ã<=_‰»^¼Ý¶À»àeã<ÄÕ»Ósé¼ïÿ;‹ç<]Å®;¶æ¼¡¯¼,•¡;ay§¼Môc»ìýÂ<¸â’<vÖ¼Ai^¼I V;.Ù¼†BS<Ò<
