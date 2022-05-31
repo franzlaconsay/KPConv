@@ -154,6 +154,7 @@ class Pheno4D_Single(Dataset):
         else:
             data = read_ply('evals/for_evaluation.ply')
             points = np.vstack((data['x'], data['y'], data['z'])).T
+            print(points)
             point_labels = data['label']
             if subsampling_parameter > 0:
                 sub_points, sub_labels = grid_subsampling(points, labels=point_labels,
