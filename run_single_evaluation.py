@@ -12,7 +12,7 @@ import numpy as np
 from datasets.Pheno4d_single import Pheno4D_Single
 parser = argparse.ArgumentParser()
 parser.add_argument('--ply_file', type=str, required=False, default='Tomato/T03_0321_a.ply')
-parser.add_argument('--model', type=str, required=False, default='/home/ervin/Desktop/Thesis/O-CNN/tensorflow/script/logs/seg/pheno4d_5_k_fold_no_pre_kfold_split_3/Maize/ratio_0.01/model/iter_000020.ckpt')
+parser.add_argument('--log_folder', type=str, required=False, default='log/k0/')
 parser.add_argument('--ply2points', required=False, default='ply2points')
 
 args = parser.parse_args()
@@ -114,7 +114,7 @@ def test_caller(path, step_ind, on_val, file):
     tester.test_segmentation_single(model,dataset,file,'evals/for_evaluation.ply')
     
         
-chosen_log = 'log/k0/'
+chosen_log = args.log_folder
 chosen_snapshot = -1
 on_val = False
 test_caller(chosen_log, chosen_snapshot, on_val=False, file=args.ply_file)
