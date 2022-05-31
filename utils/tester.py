@@ -439,7 +439,7 @@ class ModelTester:
         original_points += [points]
 
         # Create tree structure and compute neighbors
-        tree = KDTree(dataset.input_points['test'][1])
+        tree = KDTree(dataset.input_points['test'][0])
         projection_inds += [np.squeeze(tree.query(points, return_distance=False))]
 
         t2 = time.time()
